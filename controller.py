@@ -3,6 +3,8 @@ import requests
 import json
 import time
 import sys
+import random
+import time
 
 comport = 'COM5'
 
@@ -25,22 +27,22 @@ last_message_time = 0
 # Estado anterior dos LEDs
 previous_led_state = [1, 1, 1, 1, 1, 1, 1]
 
-def send_discord_message(message):
-    # Substitua 'SEU_WEBHOOK_URL_AQUI' pela URL do seu webhook do Discord
-    discord_webhook_url = 'https://discord.com/api/webhooks/1245114684450017281/2fKRNn-E7HPZJB5gUcEq0AhIsQxcXaLMbNGMAmC_0zTYfsPKdyZnCvcmu9aeTA3tryCp'
-    if discord_webhook_url:
-        payload = {
-            "content": message
-        }
-        headers = {
-            "Content-Type": "application/json"
-        }
-        try:
-            response = requests.post(discord_webhook_url, data=json.dumps(payload), headers=headers)
-            if response.status_code != 200:
-                print(f"Erro ao enviar mensagem para o Discord: {response.text}")
-        except Exception as e:
-            print(f"Erro ao tentar enviar mensagem para o Discord: {e}")
+# def send_discord_message(message):
+#     # Substitua 'SEU_WEBHOOK_URL_AQUI' pela URL do seu webhook do Discord
+#     discord_webhook_url = 'https://discord.com/api/webhooks/1245114684450017281/2fKRNn-E7HPZJB5gUcEq0AhIsQxcXaLMbNGMAmC_0zTYfsPKdyZnCvcmu9aeTA3tryCp'
+#     if discord_webhook_url:
+#         payload = {
+#             "content": message
+#         }
+#         headers = {
+#             "Content-Type": "application/json"
+#         }
+#         try:
+#             response = requests.post(discord_webhook_url, data=json.dumps(payload), headers=headers)
+#             if response.status_code != 200:
+#                 print(f"Erro ao enviar mensagem para o Discord: {response.text}")
+#         except Exception as e:
+#             print(f"Erro ao tentar enviar mensagem para o Discord: {e}")
 
 def led(fingerUp):
     global last_message_time, previous_led_state
@@ -63,7 +65,7 @@ def led(fingerUp):
         else:
             message = "# Alteração LED #\n> Todos os LEDs foram acesos!"
         
-        send_discord_message(message)
+        # send_discord_message(message)
 
     # Atualizando o estado anterior dos LEDs
     previous_led_state = fingerUp
@@ -81,7 +83,7 @@ def led(fingerUp):
         last_message_time = current_time
         led_status = "ligada" if any(fingerUp) else "desligada"
         message = f"# Alteração LED #\n> Agora a luz está {led_status}!"
-        send_discord_message(message)
+        # send_discord_message(message)
 
     # Restante do código para acender as luzes
     if fingerUp == [0,0,0,0,0]:
@@ -180,6 +182,14 @@ def led(fingerUp):
         led_5.write(0)#Sala de jantar
         led_6.write(0)#Banheiro
         led_7.write(0)#Quarto da bagunça
+    elif fingerUp == [1, 1, 1, 0, 1]:
+        # Corredor ligado, outros desligados
+        led_states = [1, 0, 0, 0, 0, 0, 0]  # Inicializando com todos desligados
+        for i in range(len(led_states)):
+            # Sorteando entre 0 e 1 para cada LED
+            led_states[i] = random.randint(0, 1)
+            # Escrevendo no pino correspondente com um pequeno atraso
+            eval(f'led_{i+1}').write(led_states[i])  # Escrevendo o estado sorteado no pino
     elif fingerUp == [1,0,1,0,0]:
         led_1.write(0)#Corredor
         led_2.write(0)#Quarto de solteiro
