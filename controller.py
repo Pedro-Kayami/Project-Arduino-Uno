@@ -8,7 +8,7 @@ import random
 import time
     
 
-comport = 'COM5'
+comport = 'COM6'
 
 board = pyfirmata.Arduino(comport)
 
